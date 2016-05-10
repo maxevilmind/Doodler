@@ -1,6 +1,7 @@
 package com.example.evilmind.doodler;
 
 import android.Manifest;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,24 @@ public class TheCanvas extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_canvas);
+
+        SimpleDrawingView sv = (SimpleDrawingView) findViewById(R.id.SimpleDrawingView);
+        String path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM).getAbsolutePath();
+
+        Bundle b = getIntent().getExtras();
+        if (b!=null) {
+            int id = b.getInt("imageNumber");
+            if (id != -1) {
+                sv.drawFlag = true;
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                String file;
+                file = new String(path + "/image" + id + ".png");
+                sv.bitmapToDraw = BitmapFactory.decodeFile(file);
+            }
+        }
     }
 
     @Override
@@ -34,7 +53,12 @@ public class TheCanvas extends AppCompatActivity {
         Bitmap bitmap = content.getDrawingCache();
         String path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DCIM).getAbsolutePath();
-        File file = new File(path+"/image.png");
+        File file;
+        int iter = 0;
+        while (true) {
+            file = new File(path + "/image" + (iter++) + ".png");
+            if (!file.exists()) break;
+        }
         FileOutputStream ostream;
         try {
             file.createNewFile();

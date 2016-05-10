@@ -21,6 +21,8 @@ public class SimpleDrawingView extends View {
 
     private Paint paint = new Paint();
     private Path path = new Path();
+    public boolean drawFlag;
+    public Bitmap bitmapToDraw;
 
     public SimpleDrawingView(Context context, AttributeSet attrs) {
 
@@ -30,13 +32,21 @@ public class SimpleDrawingView extends View {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
-
+        //paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
+    public void LoadImage(Canvas canvas)
+    {
+        //Canvas MyCanvas = new Canvas(bitmapToDraw.copy(Bitmap.Config.ARGB_8888, true));
+        if (bitmapToDraw != null) {
+            canvas.drawBitmap(bitmapToDraw, 0, 0, paint);
+        }
+    }
     @Override
     protected void onDraw(Canvas canvas)
     {
         canvas.drawPath(path, paint);
+        LoadImage(canvas);
     }
 
     @Override

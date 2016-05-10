@@ -2,6 +2,7 @@ package com.example.evilmind.doodler;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,9 +10,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Spinner;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    ListView imageList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,11 +32,28 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Refresh", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                LoadImages();
             }
         });
 
+        imageList = (ListView) findViewById(R.id.listView);
+        LoadImages();
+
+        imageList.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Intent intent = new Intent(MainActivity.this, TheCanvas.class);
+                        Bundle b = new Bundle();
+                        b.putInt("imageNumber", (int)id); //Your id
+                        intent.putExtras(b); //Put your id to your next Intent
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+        );
     }
 
     public void doodlingActivityStart(View view)
@@ -55,5 +81,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    public void LoadImages()
+    {
+        ArrayList<String> options=new ArrayList<String>();
+
+        String path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM).getAbsolutePath();
+        File file;
+        int iter = 0;
+        while (true) {
+            file = new File(path + "/image" + (iter++) + ".png");
+            if (file.exists()) options.add("Image " + iter);
+            if (iter > 256) break;
+        }
+        // use default spinner item to show options in spinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,options);
+        imageList.setAdapter(adapter);
+
     }
 }
